@@ -1,6 +1,7 @@
 const express = require('express');
-const {Blockchain} = require('./simpleChain.js');
 const router = express.Router();
+
+const {Blockchain} = require('./services/PrivateBlockchain.js');
 const blockchain = new Blockchain();
 
 /* Get block at height. */
