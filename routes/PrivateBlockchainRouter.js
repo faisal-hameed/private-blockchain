@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const {Blockchain} = require('./services/PrivateBlockchain.js');
+
 const blockchain = new Blockchain();
 
 /* Get block at height. */
@@ -21,6 +22,7 @@ router.get('/:blockHeight(\\d+)', function(req, res, next) {
   })
 });
 
+/* Validate blockchain */
 router.get('/validate', function(req, res, next){
   blockchain.validateChain()
   .then(function(data){
@@ -33,6 +35,7 @@ router.get('/validate', function(req, res, next){
   })
 });
 
+/* Create new block */
 router.post('/', function(req, res, next){
   console.log('Handle addBlock');
   console.log('Block body : ' + JSON.stringify(req.body));
