@@ -6,15 +6,12 @@ const MessageSigning = require('./services/MessageSigning');
 
 /* Generate hash of given data {"data" : ""}*/
 router.post('/hash', function(req, res, next){
-  const reqBody = req.body;
-  console.log('Req body : ' + JSON.stringify(reqBody));
-  if (!reqBody){
-    console.log("Missing key : data");
-  }
-  console.log('Generate hash of : ' + reqBody.data);
-  Hashing.generateSHA256Hash(reqBody.data)
-  .then(function(data){
-    res.send(JSON.stringify(data));
+  console.log('Req body : ' + JSON.stringify(req.body));
+
+  console.log('Generate hash of : ' + req.body.data);
+  Hashing.generateSHA256Hash(req.body.data)
+  .then(function(result){
+    res.send({"hash": result});
   })
   .catch(function(err){
     console.log('Error generateHash(data)' + err);
@@ -27,20 +24,16 @@ router.post('/hash', function(req, res, next){
 });
 
 
-/* Sign message with private key {"message":"", "privateKey":""} */
+/* Sign data with private key {"data":"", "privateKey":""} */
 router.post('/sign/generate', function(req, res, next){
-  const reqBody = req.body;
-  console.log('Req body : ' + JSON.stringify(reqBody));
-  const message = req.body.message;
-  const privateKey = req.body.privateKey
-  console.log("chk -0" + privateKey);
+  console.log('Req body : ' + JSON.stringify(req.body));
 
-  MessageSigning.signMessage(message, privateKey)
-  .then(function(data){
-    res.send(JSON.stringify({"signature" : data}));
+  MessageSigning.signMessage(req.body.data, req.body.privateKey)
+  .then(function(result){
+    res.send({"signature" : result});
   })
   .catch(function(err){
-    console.log('Error signMessage(message, privateKey)' + err);
+    console.log('Error signMessage(data, privateKey)' + err);
     res.status(500).send({
       'code':'500',
       'status':'Internal Server Error',
@@ -49,20 +42,16 @@ router.post('/sign/generate', function(req, res, next){
   });
 });
 
-/* Validate message signature {"message":"", "privateKey":""} */
+/* Validate data signature {"data":"", "privateKey":""} */
 router.post('/sign/validate', function(req, res, next){
-  const reqBody = req.body;
-  console.log('Req body : ' + JSON.stringify(reqBody));
-  const message = req.body.message;
-  const walletAddress = req.body.walletAddress;
-  const signature = req.body.signature
+  console.log('Req body : ' + JSON.stringify(req.body));
 
-  MessageSigning.validateSignature(message, walletAddress, signature)
-  .then(function(data){
-    res.send(JSON.stringify({"signature" : data}));
+  MessageSigning.validateSignature(req.body.data, req.body.walletAddress, req.body.signature)
+  .then(function(result){
+    res.send(JSON.stringify({"isValid" : result}));
   })
   .catch(function(err){
-    console.log('Error validateSignature(message, walletAddress, signature)' + err);
+    console.log('Error validateSignature(data, walletAddress, signature)' + err);
     res.status(500).send({
       'code':'500',
       'status':'Internal Server Error',

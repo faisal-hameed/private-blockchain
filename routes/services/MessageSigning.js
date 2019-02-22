@@ -8,12 +8,16 @@ const bitcoinMessage = require('bitcoinjs-message')
  */
 class MessageSigning {
 
-    static async signMessage(message, privateKey) {
+    static async signMessage(data, privateKey) {
         return new Promise((resolve, reject) => {
+            if(!data || !privateKey){
+                reject("Missing parameters");
+            }
+            
             var keyPair = bitcoin.ECPair.fromWIF(privateKey)
             var pKey = keyPair.privateKey
 
-            var signature = bitcoinMessage.sign(message, pKey, keyPair.compressed)
+            var signature = bitcoinMessage.sign(data, pKey, keyPair.compressed)
             console.log("Signature generated : " + signature)
             signature = signature.toString('base64');
             console.log("Base64 Signature : " + signature)
@@ -21,9 +25,13 @@ class MessageSigning {
         });
     }
 
-    static async validateSignature(message, address, signature) {
+    static async validateSignature(data, address, signature) {
         return new Promise((resolve, reject) => {
-            let result = bitcoinMessage.verify(message, address, signature);
+            if(!data || !address || !signature){
+                reject("Missing parameters");
+            }
+
+            let result = bitcoinMessage.verify(data, address, signature);
             console.log("Signature is " + result);
             resolve(result);
         });
